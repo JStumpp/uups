@@ -9,18 +9,18 @@ Pretty error page for Java Web apps (Spring Boot, Javalin, ...) that helps you d
 ![image](img/screenshot.png)
 
 ## Dependency
-WARNING: NOT YET ON MAVEN CENTRAL, PLEASE STAY TUNED, WILL BE RELEASED SOON.
+
 ### Maven
 ```xml
 <dependency>
     <groupId>com.github.jstumpp</groupId>
     <artifactId>uups</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 </dependency>
 ```
 ### Gradle
 ```groovy
-compile('com.github.jstumpp:uups:0.1.0')
+compile('com.github.jstumpp:uups:0.1.1')
 ```
 
 ## Usage
