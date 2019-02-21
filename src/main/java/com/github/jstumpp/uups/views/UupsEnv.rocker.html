@@ -1,0 +1,34 @@
+@import java.util.*
+@args (Map<String, Map<String, String>> env)
+
+<div class="details">
+
+    <div class="data-table-container" id="data-tables">
+        @for ((key, value) : env) {
+        <div class="data-table" id="sg-{{e.key}}">
+
+            @if(value.size() > 0) {
+            <h2 class="details-heading">@key</h2>
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <td class="data-table-k">Key</td>
+                    <td class="data-table-v">Value</td>
+                </tr>
+                </thead>
+                @for ((data_key, data_value) : value) {
+                <tr>
+                    <td>@data_key</td>
+                    <td>@data_value</td>
+                </tr>
+                }
+            </table>
+            } else {
+            <h2 class="details-heading empty">@key</h2>
+            <span class="empty">empty</span>
+            }
+        </div>
+        }
+    </div>
+
+</div>

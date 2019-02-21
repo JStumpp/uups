@@ -1,0 +1,138 @@
+// old-style plugins that are not registered at plugins.gradle.org:
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0"
+  }
+}
+
+// new-style plugins that ARE registered at plugins.gradle.org:
+plugins {
+  id 'java'
+  id 'maven'
+  id "com.fizzed.rocker" version "1.2.1"
+  id 'signing'
+  id 'org.springframework.boot' version '1.5.3.RELEASE'
+  id 'com.palantir.git-version' version '0.5.2'
+}
+apply plugin: 'io.codearte.nexus-staging'
+
+group = 'com.github.jstumpp'
+version gitVersion() // https://github.com/palantir/gradle-git-version
+
+ext {
+  isReleaseVersion = (version ==~ /\d+\.\d+\.\d+/)
+  publishUrl = (isReleaseVersion ? 'https://oss.sonatype.org/service/local/staging/deploy/maven2/' : 'file:build/.m2')
+  publishUserName = project.findProperty('publishUsername') ?: ''
+  publishPassword = project.findProperty('publishPassword') ?: ''
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compileOnly 'javax.servlet:servlet-api:2.+'
+  compile 'com.fizzed:rocker-runtime:1.2.1'
+  testCompile('org.springframework.boot:spring-boot')
+  testCompile('org.springframework.boot:spring-boot-starter-web')
+  testCompile('org.springframework.boot:spring-boot-autoconfigure')
+  testCompile('junit:junit')
+  testCompile('org.springframework.boot:spring-boot-starter-test')
+  testCompile('org.apache.httpcomponents:httpclient')
+}
+
+bootRepackage {
+  enabled = false
+}
+
+rocker {
+  optimize true
+}
+
+sourceSets {
+  main {
+    rocker {
+      srcDir file('src/main/java/')
+    }
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+signing {
+  required { isReleaseVersion && gradle.taskGraph.hasTask('uploadArchives') }
+  sign configurations.archives
+}
+
+uploadArchives {
+  doFirst {
+    println "Will upload version '${version}' to '${publishUrl}' (isReleaseVersion=${isReleaseVersion})"
+  }
+
+  repositories {
+    mavenDeployer {
+      if (isReleaseVersion) {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+      }
+      repository(url: publishUrl) {
+        authentication(
+          userName: publishUserName,
+          password: publishPassword
+        )
+      }
+
+      pom.project {
+         name 'Uups! - Pretty error page for Java Web Applications'
+         packaging 'jar'
+         description 'Uups! - Pretty error page for Java Web Applications that helps you debug your web application.'
+         url 'https://github.com/jstumpp/uups'
+
+         scm {
+           url 'scm:git@github.com:jstumpp/uups.git'
+           connection 'scm:git@github.com:jstumpp/uups.git'
+           developerConnection 'scm:git@github.com:jstumpp/uups.git'
+         }
+
+         licenses {
+           license {
+             name 'MIT License'
+             url 'https://opensource.org/licenses/MIT'
+             distribution 'repo'
+           }
+         }
+
+         developers {
+           developer {
+             id 'jstumpp'
+             name 'Jürgen Stumpp'
+           }
+         }
+       }
+    }
+  }
+}
+
+// https://github.com/Codearte/gradle-nexus-staging-plugin/
+if (isReleaseVersion) {
+  uploadArchives.finalizedBy closeAndReleaseRepository
+}

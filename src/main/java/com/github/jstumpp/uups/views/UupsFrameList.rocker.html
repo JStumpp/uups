@@ -1,0 +1,20 @@
+@import java.util.*
+@import com.github.jstumpp.uups.UupsFrame
+@args (List<UupsFrame> frames)
+
+<!--  List file names & line numbers for all stack frames;
+         clicking these links/buttons will display the code view
+         for that particular frame  -->
+@for ((i, frame) : frames) {
+<div class="frame@if(i.index() == 0 ){ active}@if(frame.source.length() > 0){ source}" id="frame-line-@i.index()">
+    <div class="frame-method-info">
+        <span class="frame-index">@(frames.size() - i.index() - 1)</span>
+        <span class="frame-class">@frame.type</span>@if(frame.methodName.length() >0){.<span class="frame-function">@(frame.methodName)()</span>}
+    </div>
+
+    <span class="frame-file">
+      @frame.fileName:<!--
+   --><span class="frame-line">@frame.lineNumber</span> at @frame.location
+    </span>
+</div>
+}
