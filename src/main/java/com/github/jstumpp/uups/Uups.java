@@ -3,10 +3,10 @@ package com.github.jstumpp.uups;
 import com.github.jstumpp.uups.views.UupsLayout;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,9 +37,16 @@ public class Uups {
         return stringWriter.toString();
     }
 
+    static String convert(InputStream inputStream, Charset charset) throws IOException {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, charset))) {
+            return br.lines().collect(Collectors.joining(System.lineSeparator()));
+        }
+    }
+
     static String readString(final ClassLoader loader, final String path) {
         try {
-            return new String(Files.readAllBytes(Paths.get(loader.getResource("uups/" + path).toURI())));
+            InputStream in = loader.getResourceAsStream("uups/" + path);
+            return convert(in, StandardCharsets.UTF_8);
         } catch (Exception e) {
         }
         return "";
