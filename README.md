@@ -1,4 +1,4 @@
-# Uups! [![Build Status](https://travis-ci.org/jstumpp/uups.svg?branch=master)](https://travis-ci.org/jstumpp/uups)
+# Uups! <a href='https://search.maven.org/search?q=g:com.github.jstumpp%20a:uups'><img src='http://img.shields.io/maven-central/v/com.github.jstumpp/uups.svg'></a>
 
 Pretty error page for Java Web apps (Spring Boot, Javalin, ...) that helps you debug your web application in the browser. Because stacktraces can be hard to read in the console!
  * See request parameters, headers, route, session and response status
